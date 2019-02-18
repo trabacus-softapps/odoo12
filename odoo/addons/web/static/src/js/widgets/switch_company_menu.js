@@ -71,12 +71,15 @@ var SwitchCompanyMenu = Widget.extend({
     _onClick: function (ev) {
         ev.preventDefault();
         var companyID = $(ev.currentTarget).data('company-id');
+        var menuID = $('a[data-menu-xmlid="Hotelscentric.menu_hc_res_company"]').data('menu');
+        var reload_url = 'web#id='+ companyID  +'&view_type=form&model=res.company&menu_id='+menuID;
         this._rpc({
             model: 'res.users',
             method: 'write',
             args: [[session.uid], {'company_id': companyID}],
         })
         .then(function() {
+            window.location.href = reload_url;
             location.reload();
         });
     },
