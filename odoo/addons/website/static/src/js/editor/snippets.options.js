@@ -462,6 +462,52 @@ options.registry.sizing_x = options.registry.sizing.extend({
     },
 });
 
+options.registry.layout_options = options.Class.extend({
+
+    //--------------------------------------------------------------------------
+    // Options
+    //--------------------------------------------------------------------------
+
+    /**
+     * Changes the number of columns.
+     *
+     * @see this.selectClass for parameters
+     */
+    selectCount: function (previewMode, value, $opt) {
+        //this._updateColumnCount(value - this.$target.children().length);
+        console.log("setting the option value")
+        if(value == 1)
+        {
+            this.$target[0].setAttribute('class','col-md-4 pull-left no_clear');
+        }
+        else if(value == 2)
+        {
+            this.$target[0].setAttribute('class','col-md-4 pull-right no_clear');
+        }
+        else if(value == 3)
+        {
+            this.$target[0].setAttribute('class','col-md-6 pull-left no_clear');
+        }
+        else if(value == 4)
+        {
+            this.$target[0].setAttribute('class','col-md-6 pull-right no_clear');
+        }
+        else if(value == 5)
+        {
+            this.$target[0].setAttribute('class','col-md-8 pull-left no_clear');
+        }
+        else if(value == 6)
+        {
+            this.$target[0].setAttribute('class','col-md-8 pull-right no_clear');
+        }
+        else if(value == 7)
+        {
+            this.$target[0].setAttribute('class','col-md-12');
+        }
+
+    },
+});
+    
 options.registry.layout_column = options.Class.extend({
 
     //--------------------------------------------------------------------------
