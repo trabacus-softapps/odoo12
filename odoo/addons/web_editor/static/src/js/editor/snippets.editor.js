@@ -494,15 +494,9 @@ var SnippetEditor = Widget.extend({
      */
     _onRemoveClick: function (ev) {
         ev.preventDefault();
-        if(!this.$target[0].isContentEditable)
-        {
-            alert('You are not allowed to delete this section.');
-        }
-        else
-        {
-            this.trigger_up('request_history_undo_record', {$target: this.$target});
-            this.removeSnippet();
-        }
+        this.trigger_up('request_history_undo_record', {$target: this.$target});
+        this.removeSnippet();
+        
     },
 });
 
