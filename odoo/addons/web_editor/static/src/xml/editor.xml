@@ -63,6 +63,7 @@
                     <span class="fa fa-search" title="Search" role="img" aria-label="Search"/>
                 </div>
             </li>
+            <li class="imagebank"/>
             <li class="nav-item search">
                 <div class="btn-group">
                     <a role="button" class="btn btn-secondary disabled previous" href="#"><i class="fa fa-angle-left"/>&#32;Previous</a>
@@ -94,6 +95,7 @@
             <div class="o_media_image_card card w-100">
                 <div class="card-body p-0">
                     <div class="form-inline">
+                        <input type="number" id="hidden_folder_id" class="d-none" name="hidden_folder_id"/>
                         <input type="file" class="d-none" name="upload" t-att-accept="widget.accept" multiple="multiple"/>
                         <input type="hidden" name="disable_optimization" value=""/>
                         <div class="btn-group">
@@ -149,9 +151,27 @@
                     <i t-if="attachment.res_model === 'ir.ui.view'" class="fa fa-times o_existing_attachment_remove" title="This file is a public view attachment" role="img" aria-label="This file is a public view attachment" t-att-data-id="attachment.id"/>
                     <i t-else="" class="fa fa-times o_existing_attachment_remove" title="This file is attached to the current record" role="img" aria-label="This file is attached to the current record" t-att-data-id="attachment.id"/>
                     <div class="o_attachment_border" t-att-style="attachment.res_model === 'ir.ui.view' ? null : 'border: 1px solid #5cb85c;'"><div t-att-data-src="attachment.src" t-att-data-url="attachment.url" role="img" t-att-aria-label="attachment.name" t-att-title="attachment.name" t-att-data-id="attachment.id" t-att-data-mimetype="attachment.mimetype" class="o_image o_image_loading"/></div>
+                    <t t-esc="attachment.name"/>
                 </div>
             </div>
         </div>
+    </t>
+    <t t-name="web_editor.dialog.image.bank">
+        <li class="imagebank" style="float: right;">
+            <t t-set="prev"/>
+            <span style="font-weight:bold; padding-right:10px">SELECT FOLDER</span>
+            <div class="btn-group">
+                    <select id="folder_name" class="folder" style="height:35px; border:4px solid #ccc; margin-right:90px;">
+                    <!--<select id="folder_name" style="height:35px; border:4px solid #ccc; margin-right:90px;" >-->
+                    <option value=""></option>
+                        <t t-as="folder" t-foreach="rows">
+                            <option t-att-value="folder.id">
+                                <t t-esc="folder.name"/>
+                            </option>
+                        </t>
+                </select>
+            </div>
+        </li>
     </t>
     <t t-name="web_editor.dialog.image.existing.error">
         <div class="form-text">
