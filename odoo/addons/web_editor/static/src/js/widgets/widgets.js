@@ -197,7 +197,7 @@ var ImageWidget = MediaWidget.extend({
     },
 
     IMAGES_PER_ROW: 6,
-    IMAGES_ROWS: 2,
+    IMAGES_ROWS: 10,
 
     /**
      * @constructor
@@ -214,9 +214,9 @@ var ImageWidget = MediaWidget.extend({
         } else if (options.res_id) {
             this.domain = ['|',
                 '&', ['res_model', '=', options.res_model], ['res_id', '=', options.res_id],
-                ['res_model', '=', 'ir.ui.view']];
+                ['res_model', '=', 'hc.image.bank']];
         } else {
-            this.domain = [['res_model', '=', 'ir.ui.view']];
+            this.domain = [['res_model', '=', 'hc.image.bank']];
         }
 
         this.multiImages = options.multiImages;
@@ -308,7 +308,7 @@ var ImageWidget = MediaWidget.extend({
 
         return def.then(function () {
             if (!img.isDocument) {
-                if (img.access_token && self.options.res_model !== 'ir.ui.view') {
+                if (img.access_token && self.options.res_model !== 'hc.image.bank') {
                     img.src += _.str.sprintf('?access_token=%s', img.access_token);
                 }
                 if (!self.$media.is('img')) {
@@ -317,7 +317,7 @@ var ImageWidget = MediaWidget.extend({
                     // by design because of libraries and client databases img.
                     self._replaceMedia($('<img/>', {class: 'img-fluid o_we_custom_image'}));
                 }
-                self.$media.attr('src', img.src);
+                self.$media.attr('src', img.src.replace('/160x120/','/'));
 
             } else {
                 if (!self.$media.is('a')) {
@@ -325,7 +325,7 @@ var ImageWidget = MediaWidget.extend({
                     self._replaceMedia($('<a/>'));
                 }
                 var href = '/web/content/' + img.id + '?';
-                if (img.access_token && self.options.res_model !== 'ir.ui.view') {
+                if (img.access_token && self.options.res_model !== 'hc.image.bank') {
                     href += _.str.sprintf('access_token=%s&', img.access_token);
                 }
                 href += 'unique=' + img.checksum + '&download=true';
@@ -364,19 +364,22 @@ var ImageWidget = MediaWidget.extend({
             this.$('input.url').val('').trigger('input').trigger('change');
         }
         // TODO: Expand this for adding SVG
-        var domain = this.domain.concat(['|', ['mimetype', '=', false], ['mimetype', this.options.document ? 'not in' : 'in', ['image/gif', 'image/jpe', 'image/jpeg', 'image/jpg', 'image/gif', 'image/png']]]);
+        //var domain = this.domain.concat(['|', ['mimetype', '=', false], ['mimetype', this.options.document ? 'not in' : 'in', ['image/gif', 'image/jpe', 'image/jpeg', 'image/jpg', 'image/gif', 'image/png']]]);
+        var domain = this.domain.concat([['res_model', '=', 'hc.image.bank']]);
         if (needle && needle.length) {
             domain.push('|', ['datas_fname', 'ilike', needle], ['name', 'ilike', needle]);
         }
         domain.push('|', ['datas_fname', '=', false], '!', ['datas_fname', '=like', '%.crop'], '!', ['name', '=like', '%.crop']);
+        console.log('domaidomainn',domain);
         return this._rpc({
             model: 'ir.attachment',
             method: 'search_read',
             args: [],
             kwargs: {
                 domain: domain,
-                fields: ['name', 'datas_fname', 'mimetype', 'checksum', 'url', 'type', 'res_id', 'res_model', 'access_token'],
-                order: [{name: 'id', asc: false}],
+                fields: ['name', 'datas_fname', 'mimetype', 'checksum', 'url', 'type',
+                    'hc_image_bank_id', 'res_id', 'res_model', 'access_token'],
+                order: [{name: 'id', asc: true}],
                 context: weContext.get(),
             },
         }).then(function (records) {
@@ -405,7 +408,7 @@ var ImageWidget = MediaWidget.extend({
                 .value();
 
             _.each(self.records, function (record) {
-                record.src = record.url || _.str.sprintf('/web/image/%s/%s', record.id, encodeURI(record.name));  // Name is added for SEO purposes
+                record.src = record.url || _.str.sprintf('/web/image/%s/160x120/%s', record.id, encodeURI(record.name));  // Name is added for SEO purposes
                 record.isDocument = !(/gif|jpe|jpg|png/.test(record.mimetype));
             });
             if (!noRender) {
@@ -454,7 +457,21 @@ var ImageWidget = MediaWidget.extend({
         this.$('.form-text').empty();
 
         this.$('.existing-attachments').replaceWith(QWeb.render('web_editor.dialog.image.existing.content', {rows: rows}));
-
+        this._rpc({
+            model: 'hc.image.bank',
+            method: 'search_read',
+            args: [],
+            kwargs: {
+                domain:[],
+                fields: ['name'],
+                order: [{name: 'id', asc: true}],
+            }
+        }).then(function (result){
+            var selected = $('.imagebank').find('select').find("option:selected").text();
+            var prev = $('.folder').val();
+            $('.imagebank').replaceWith(QWeb.render('web_editor.dialog.image.bank', {rows: result}));
+            $('.folder').val(prev);
+        });
         var $divs = this.$('.o_image');
         var imageDefs = _.map($divs, function (el) {
             var $div = $(el);
@@ -503,7 +520,12 @@ var ImageWidget = MediaWidget.extend({
      */
     _uploadImage: function () {
         var self = this;
-
+        var folder_name = $('#folder_name').val();
+        $('#hidden_folder_id').val(folder_name);
+        if (folder_name == '') {
+            alert('Please select the folder to which you wish to add this image, from the drop down above.');
+            return false;
+        }
         /**
          * @todo file upload cannot be handled with _rpc smoothly. This uses the
          * form posting in iframe trick to handle the upload.
@@ -623,6 +645,12 @@ var ImageWidget = MediaWidget.extend({
      * @private
      */
     _onUploadButtonClick: function () {
+        var folder_name = $('#folder_name').val();
+            $('#hidden_folder_id').val(folder_name);
+            if (folder_name == '') {
+                alert('Please select the folder to which you wish to add this image, from the drop down above.');
+                return false;
+                }
         this.$('input[type=file]').click();
     },
     /**
@@ -1108,6 +1136,7 @@ var MediaDialog = Dialog.extend({
     ),
     events : _.extend({}, Dialog.prototype.events, {
         'input input#icon-search': '_onSearchInput',
+        'change select': 'select_search',
         'shown.bs.tab a[data-toggle="tab"]': '_onTabChange',
         'click .previous:not(.disabled), .next:not(.disabled)': '_onPagerClick',
     }),
@@ -1304,12 +1333,27 @@ var MediaDialog = Dialog.extend({
      * @private
      */
     _onSearchInput: function (ev) {
+        console.log('evevevevev',$(ev.currentTarget).val());
         var self = this;
         this.active.goToPage(0);
-        this.active.search($(ev.currentTarget).val() || '').then(function () {
+        var needle = $(ev.currentTarget).val();
+        var folder = this.$("#folder_name option:selected").text().trim();
+        var inputvalue = (folder && folder + '-'  || '') + (needle);
+        console.log('_onSearchInput', inputvalue);
+        this.active.search(inputvalue || '').then(function () {
             self._updateControlPanel();
         });
     },
+    select_search: function (ev) {
+        var self = this;
+        var needle = this.$("#icon-search").val()
+        var folder = this.$("#folder_name option:selected").text().trim();
+        var inputvalue = (folder && folder + '-'  || '') + (needle);
+        console.log('folder1', inputvalue);
+        this.active.search(inputvalue || '').then(function () {
+            self._updateControlPanel();
+        });
+        },
     /**
      * @private
      */
