@@ -520,7 +520,15 @@ var RTEWidget = Widget.extend({
             $editable.find('.oe_currency_value').attr('contenteditable', true);
         }
         if ($editable.is('[data-oe-model]') && !$editable.is('[data-oe-model="ir.ui.view"]') && !$editable.is('[data-oe-type="html"]')) {
-            $editable.data('layoutInfo').popover().find('.btn-group:not(.note-history)').remove();
+            if($editable.is('[data-oe-model]'))
+            {
+                console.log("Pass");
+            }
+            else
+            {
+                $editable.data('layoutInfo').popover().find('.btn-group:not(.note-history)').remove();
+            }
+            
         }
     },
     /**
