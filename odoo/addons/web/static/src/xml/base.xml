@@ -1045,8 +1045,8 @@
                 <t t-raw="file.data.name || file.data.filename"/>
             </a>
         </div>
-    </t>
-    <t t-else="1">
+    </t>-->
+    <t>
         <div t-foreach="widget.value.data" t-as="file" class="oe_attachment">
             <t t-if="!file.data.upload">
                 <div>
