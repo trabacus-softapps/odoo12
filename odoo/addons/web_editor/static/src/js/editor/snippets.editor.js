@@ -142,15 +142,15 @@ var SnippetEditor = Widget.extend({
      */
     removeSnippet: function () {
         this.toggleFocus(false);
-
-        this.trigger_up('call_for_each_child_snippet', {
-            $snippet: this.$target,
-            callback: function (editor, $snippet) {
-                for (var i in editor.styles) {
-                    editor.styles[i].onRemove();
-                }
-            },
-        });
+// not sure whether there will be any impact. If required revert this commented code in future
+//         this.trigger_up('call_for_each_child_snippet', {
+//             $snippet: this.$target,
+//             callback: function (editor, $snippet) {
+//                 for (var i in editor.styles) {
+//                     editor.styles[i].onRemove();
+//                 }
+//             },
+//         });
 
         var $parent = this.$target.parent();
         this.$target.find('*').andSelf().tooltip('dispose');
