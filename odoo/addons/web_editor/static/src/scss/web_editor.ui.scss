@@ -1291,7 +1291,10 @@ body .modal {
     // SELECT MEDIA
     .o_select_media_dialog {
         max-width: 80%;
-
+        .tab-content,button
+        {
+            font-size: 0.8rem !important;
+        }
         .modal-body {
             .nav-tabs .active > a[href="#editor-media-icon"] {
                 background-color: white;
