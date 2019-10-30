@@ -310,7 +310,7 @@ var WebsiteRoot = BodyManager.extend({
         // when you switch 3 <--> 1, you need to force the website
 
         var website_domain = ev.currentTarget.getAttribute('domain');
-        var url = $.param.querystring(window.location.href, {'fw': website_id_to_switch_to});
+        var url = $.param.querystring(window.location.origin, {'fw': website_id_to_switch_to});
         if (website_domain && window.location.hostname !== website_domain) {
             // if domain unchanged, this line will do a nop while we need to refresh
             // the page to load the new forced website.
