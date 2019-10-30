@@ -311,7 +311,7 @@ var WebsiteRoot = BodyManager.extend({
 
         var website_domain = ev.currentTarget.getAttribute('domain');
         var url = $.param.querystring(window.location.href, {'fw': website_id_to_switch_to});
-        if (website_domain && window.location.hostname !== website_domain) {
+        if (website_domain && window.location.origin !== website_domain) {
             // if domain unchanged, this line will do a nop while we need to refresh
             // the page to load the new forced website.
             url = new URL(url);
