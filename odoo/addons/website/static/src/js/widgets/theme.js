@@ -528,6 +528,16 @@ var ThemeCustomizeDialog = Dialog.extend({
                             .replace(/( *)(.*hook.*)/, _.str.sprintf('$1%s$1$2', replacement));
                     }
                 });
+                
+                updatedFileContent = "$o-user-theme-color-palette: map-merge($o-user-theme-color-palette, o-map-omit(( "
+                        + " 'alpha': #8d1b3d, "
+                        + " 'beta': null, "
+                        + " 'gamma': null, "
+                        + " 'delta': null, "
+                        + " 'epsilon': null, "
+                        + " 'footer' : #f3f3f3, "
+                        // -- hook --
+                    + ")));"
 
                 return self._rpc({
                     route: '/web_editor/save_scss',
